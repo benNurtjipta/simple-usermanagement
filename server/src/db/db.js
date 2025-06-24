@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
-import 'dotenv/config';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '../../.env' });
 
 export default {
   connect: async () => {
@@ -14,6 +16,7 @@ export default {
     mongoose.connection.on('error', (error) =>
       console.log(`🚨 "${mongoose.connection.name}" DB Error:`, error),
     );
+
     await mongoose.connect(process.env.MONGO_DB_URI);
   },
   close: async () => {
