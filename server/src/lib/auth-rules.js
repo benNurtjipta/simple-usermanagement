@@ -12,14 +12,6 @@ export const userValidationRules = {
       .isAlphanumeric()
       .withMessage('Username must contain only letters and numbers'),
 
-    check('email')
-      .trim()
-      .normalizeEmail()
-      .notEmpty()
-      .withMessage('Email is required')
-      .isEmail()
-      .withMessage('Invalid email format'),
-
     check('password')
       .trim()
       .notEmpty()
@@ -39,13 +31,15 @@ export const userValidationRules = {
       .withMessage('Password must be at least 8 characters long'),
   ],
   login: [
-    check('email')
+    check('username')
       .trim()
-      .normalizeEmail()
+      .escape()
       .notEmpty()
-      .withMessage('Email is required')
-      .isEmail()
-      .withMessage('Invalid email format'),
+      .withMessage('Username is required')
+      .isLength({ min: 3, max: 30 })
+      .withMessage('Username must be between 3 and 30 characters long')
+      .isAlphanumeric()
+      .withMessage('Username must contain only letters and numbers'),
 
     check('password')
       .trim()

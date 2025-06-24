@@ -5,14 +5,14 @@ import db from '../db/db.js';
 export const createUser = async (req, res, next) => {
   await db.connect();
   try {
-    const { username, email, password } = req.body;
+    const { username, password, location } = req.body;
 
     const existingUser = await User.findOne({
-      $or: [{ username }, { email }],
+      $or: [{ username }],
     });
 
     if (existingUser) {
-      const error = new Error('Username or email already exists');
+      const error = new Error('Username already exists');
       error.statusCode = 400;
       return next(error);
     }
@@ -21,8 +21,8 @@ export const createUser = async (req, res, next) => {
 
     const newUser = new User({
       username,
-      email,
       password: hashedPassword,
+      location,
     });
 
     await newUser.save();
@@ -32,7 +32,6 @@ export const createUser = async (req, res, next) => {
         _id: newUser._id,
         username: newUser.username,
         role: newUser.role,
-        verified: newUser.verified,
       },
       '30d',
     );
@@ -54,12 +53,12 @@ export const createUser = async (req, res, next) => {
 export const verifyUser = async (req, res, next) => {
   await db.connect();
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ username });
 
     if (!user) {
-      const error = new Error('Invalid email or password');
+      const error = new Error('Invalid username or password');
       error.statusCode = 401;
       return next(error);
     }
@@ -67,14 +66,14 @@ export const verifyUser = async (req, res, next) => {
     const isPasswordValid = await comparePassword(password, user.password);
 
     if (!isPasswordValid) {
-      const error = new Error('Invalid email or password');
+      const error = new Error('Invalid username or password');
       error.statusCode = 401;
       return next(error);
     }
 
-    const { _id, username, role, verified } = user;
+    const { _id, role } = user;
 
-    const token = createJWT({ _id, username, role, verified }, '30d');
+    const token = createJWT({ _id, username, role }, '30d');
 
     res.cookie('token', token, {
       httpOnly: true,

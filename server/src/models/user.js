@@ -14,7 +14,11 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-  role: [{ type: Schema.Types.ObjectId, ref: 'roles', required: true }],
+  role: {
+    type: Schema.Types.ObjectId,
+    ref: 'roles',
+    default: '685a99d154317308503f42e8',
+  },
 });
 
 export default model('User', userSchema);
