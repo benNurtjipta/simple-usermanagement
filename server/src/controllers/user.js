@@ -1,5 +1,6 @@
 import { comparePassword, createJWT, hashPassword } from '../lib/auth.js';
 import User from '../models/user.js';
+import Role from '../models/role.js';
 import db from '../db/db.js';
 
 export const createUser = async (req, res, next) => {
@@ -55,7 +56,7 @@ export const verifyUser = async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ username }).populate('role');
 
     if (!user) {
       const error = new Error('Invalid username or password');
@@ -82,7 +83,10 @@ export const verifyUser = async (req, res, next) => {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({ message: 'Login successful' });
+    res.status(200).json({
+      message: 'Login successful',
+      user: { _id, username, role },
+    });
     await db.close();
   } catch (error) {
     return next(error);

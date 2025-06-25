@@ -17,8 +17,9 @@ const userSchema = new Schema({
   role: {
     type: Schema.Types.ObjectId,
     ref: 'roles',
-    default: '685a99d154317308503f42e8',
+    default: '685bbdac1619df83939985a1',
   },
 });
 
-export default model('User', userSchema);
+const UserModel = model('users', userSchema);
+export default UserModel;
